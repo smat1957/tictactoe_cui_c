@@ -1,0 +1,247 @@
+% latex uft-8
+\documentclass[uplatex,a4paper,11pt,oneside,openany]{jsbook}
+%
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{ascmac}
+\usepackage{setspace}
+\usepackage{here}
+\usepackage{listings,jlisting} %日本語のコメントアウトをする場合jlistingが必要
+%ここからソースコードの表示に関する設定
+\usepackage{xcolor,comment}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\begin{comment}
+\lstset{
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1000,                % start line enumeration with line 1000
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+\end{comment}
+
+%ここからソースコードの表示に関する設定
+
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  numbers=left,
+  frame=single,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  commentstyle=\itshape\color{purple!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+
+\lstdefinestyle{customasm}{
+  belowcaptionskip=1\baselineskip,
+  frame=L,
+  xleftmargin=\parindent,
+  language=[x86masm]Assembler,
+  basicstyle=\footnotesize\ttfamily,
+  commentstyle=\itshape\color{purple!40!black},
+}
+
+\lstset{escapechar=@,style=customc}
+
+\makeatletter
+\def\ps@plainfoot{%
+  \let\@mkboth\@gobbletwo
+  \let\@oddhead\@empty
+  \def\@oddfoot{\normalfont\hfil-- \thepage\ --\hfil}%
+  \let\@evenhead\@empty
+  \let\@evenfoot\@oddfoot}
+  \let\ps@plain\ps@plainfoot
+\renewcommand{\chapter}{%
+  \if@openright\cleardoublepage\else\clearpage\fi
+  \global\@topnum\z@
+  \secdef\@chapter\@schapter}
+\makeatother
+%
+\newcommand{\maru}[1]{{\ooalign{%
+\hfil\hbox{$\bigcirc$}\hfil\crcr%
+\hfil\hbox{#1}\hfil}}}
+%
+\setlength{\textwidth}{\fullwidth}
+\setlength{\textheight}{40\baselineskip}
+\addtolength{\textheight}{\topskip}
+\setlength{\voffset}{-0.55in}
+%
+\begin{document}
+% START DOCUMENT
+%
+% COVER
+\begin{center}
+  \huge \par
+  \vspace{15mm}
+  \huge \par
+  \vspace{15mm}
+  \LARGE Tic Tac Toe (CUI - C Language) \par
+  \vspace{100mm}
+  \Large \date \par
+  \vspace{15mm}
+  \Large \par
+  \vspace{10mm}
+  \Large S.Matoike \par
+  \vspace{10mm}
+\end{center}
+\thispagestyle{empty}
+\clearpage
+\addtocounter{page}{-1}
+\newpage
+\setcounter{tocdepth}{3}
+%
+\tableofcontents
+%
+\chapter{C言語による三目並べ [Tic Tac Toe]}
+
+\section{制作する三目並べ [Tic Tac Toe]の概要}
+
+プログラムを実行すると、盤面が表示され、×の石を置く場所を指定するよう促されます
+
+画面上に示された番号を入力すると、その番号のスロットに×の石が置かれた盤面が表示され、次の手番の○に、石を置く場所を指定するように促されます
+
+手番を交互に変えながらゲームは進み、縦、横、斜めの何れかに、先に一列に自分の石を並べた方が勝ちとなります
+
+既に石の置かれているスロット番号を指定できませんし、スロット番号として 0 〜 8 以外の数値を指定することもできません
+
+\begin{spacing}{0.74}
+  \begin{verbatim}
+    スタート！ [Tic Tac Toe]
+    /---|---|---\
+    | 0 | 1 | 2 |
+    |---|---|---|
+    | 3 | 4 | 5 |
+    |---|---|---|
+    | 6 | 7 | 8 |
+    \---|---|---/
+    'X' さんのturnです
+    石を置く場所 0 〜 8 を指定して下さい : 4
+    /---|---|---\
+    | 0 | 1 | 2 |
+    |---|---|---|
+    | 3 | X | 5 |
+    |---|---|---|
+    | 6 | 7 | 8 |
+    \---|---|---/
+    'O' さんのturnです
+    石を置く場所 0 〜 8 を指定して下さい : 2
+    /---|---|---\
+    | 0 | 1 | O |
+    |---|---|---|
+    | 3 | X | 5 |
+    |---|---|---|
+    | 6 | 7 | 8 |
+    \---|---|---/
+    'X' さんのturnです
+    石を置く場所 0 〜 8 を指定して下さい :
+  \end{verbatim}
+\end{spacing}
+
+\section{定数定義と関数プロトタイプ}
+
+printf文 で盤面を標準出力（コンソール画面）に表示し、scanf文 で石を置く場所を標準入力（キーボード）から受け取るので、 stdio.h を include します
+
+文字列の比較を行う関数 strcmp() を使うので、 string.h を include します
+
+これから作成する関数サブプログラムの関数プロトタイプを、予め宣言しておきます
+
+盤面 board[9] は、左上から右下に向かって 0 から 8 までの 9 個の整数の配列で表現し、石を置く場所はこの番号で指定させるようにします
+
+盤面に○の石が置かれたなら、board[9] 配列の中の指定された要素に、MARU を代入し、×の石は BATSU を代入することにします
+
+勝ち負けの判定を行う際、引き分けを DRAW 、まだ勝敗がついていない場合（ゲーム継続中）は、 NEXT という値を使うことにします
+
+\lstinputlisting[caption=関数プロトタイプなど：Tic Tac Toe,label=prog1]{../src/p1.c}
+
+手番（turn）は、switchTurn() 関数が呼ばれる度に、MARU と BATSU を交互に割り当てて返します
+
+\lstinputlisting[caption=手番の交代：Tic Tac Toe,label=prog2]{../src/p2.c}
+
+\section{主処理}
+
+①盤面の表示、②次の手の入力、③入力された手の配置、④手番の交代、⑤勝敗の判定、を繰り返します
+
+board[9] の各要素に予め振られた整数値の指定された場所に、手番turn（MARU 又は BATSU をとる整数変数）を代入して、盤面に石を配置します
+
+\lstinputlisting[caption=main関数：Tic Tac Toe,label=prog3]{../src/p3.c}
+
+\section{盤面の表示}
+
+board[9] の配列には、MARU と BATSU の整数値が、それぞれの石の置かれたスロットに入っており、まだ石の置かれていないところには、初期値であるスロット番号が入っています
+
+ゼロの文字コードからのオフセットを、ゼロの文字コードに加えるという方法で、数字 0 〜 8 の文字コードを生成しています
+
+\lstinputlisting[caption=盤面の表示：Tic Tac Toe,label=prog4]{../src/p4.c}
+
+\section{結果の表示}
+
+勝敗判定の結果を受け取り、それによって結果を表示しています
+
+\lstinputlisting[caption=結果の表示：Tic Tac Toe,label=prog5]{../src/p5.c}
+
+\section{手の入力}
+
+0 〜 8 以外が入力された場合に再入力を促しています
+
+盤面上に既に石が配置されているスロットを指定された場合にも、再入力を促します
+
+\lstinputlisting[caption=手の入力：Tic Tac Toe,label=prog6]{../src/p6.c}
+
+\section{勝敗の判定}
+
+横の3行、縦の3列、2つの斜め線のそれぞれのライン上で、 board[9] 配列の該当する要素を合計し、MARU が3つ並んでいたら合計が MARU*3 になり、
+BATSU が3つ並んだら合計は BATSU*3 になるはず、として判定しています（勝った方、 MARU か BATSU を返しています）
+
+盤面の配列に 0 〜 8 のどれかが残っていたなら、それはまだ試合が継続中なので、NEXT を返します
+
+盤面の配列に 0 〜 8 が残っていないのに勝敗が決まっていない場合は、引き分け DRAW を返します
+
+\lstinputlisting[caption=勝敗の判定：Tic Tac Toe,label=prog7]{../src/p7.c}
+
+\section{プログラムの最終的な形}
+
+\lstinputlisting[caption=完成：Tic Tac Toe,label=prog8]{../src/at_last.c}
+
+%
+%\section*{謝辞}
+%\addcontentsline{toc}{chapter}{謝辞}
+%
+\begin{thebibliography}{99}
+  \bibitem{1}
+\end{thebibliography}
+%
+% END DOCUMENT
+\end{document}
+%
